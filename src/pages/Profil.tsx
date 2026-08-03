@@ -35,7 +35,7 @@ export default function Profil() {
 
   return (
     <div className="px-4 py-6">
-      <h1 className="text-xl font-semibold text-foreground">Profil</h1>
+      <h1 className="text-xl font-bold tracking-tight text-foreground">Profil</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Informasi akun dan pengaturan aplikasi.
       </p>
@@ -43,7 +43,7 @@ export default function Profil() {
       {/* Account card */}
       <Card className="mt-6">
         <CardContent className="flex items-center gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
             <UserCircle size={22} weight="bold" />
           </div>
           <div className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export default function Profil() {
         <div className="mt-6">
           <div className="flex items-center gap-2">
             <UsersThree size={18} weight="bold" className="text-foreground" />
-            <h2 className="text-sm font-medium text-foreground">Kelola Pengguna</h2>
+            <h2 className="text-sm font-semibold text-foreground">Kelola Pengguna</h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Daftar seluruh pengguna beserta peran dan status akun.

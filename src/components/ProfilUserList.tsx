@@ -83,7 +83,7 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
             <div key={user.id}>
               {idx > 0 && <Separator />}
               <div className="flex items-center gap-3 py-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                   <UserCircle size={18} weight="bold" />
                 </div>
                 <div className="min-w-0 flex-1">
