@@ -351,7 +351,7 @@ export default function Stok() {
 
   return (
     <div className="px-4 py-6">
-      <h1 className="text-xl font-semibold text-foreground">Stok</h1>
+      <h1 className="text-xl font-bold tracking-tight text-foreground">Stok</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Daftar produk, status stok, dan pencatatan pergerakan barang.
       </p>
@@ -393,7 +393,7 @@ export default function Stok() {
             type="button"
             onClick={() => setStatusFilter(f.value)}
             className={cn(
-              'shrink-0 rounded-4xl border px-3 py-1 text-xs font-medium transition-colors',
+              'shrink-0 rounded-4xl border px-3 py-1.5 text-xs font-semibold transition-colors',
               statusFilter === f.value
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border bg-background text-muted-foreground',
@@ -469,28 +469,36 @@ export default function Stok() {
               <div className="flex flex-col gap-4 px-4 pb-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-xl border border-border p-3">
-                    <p className="text-xs text-muted-foreground">Harga Jual</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">
+                    <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      Harga Jual
+                    </p>
+                    <p className="mt-1 text-lg font-bold tracking-tight text-foreground tabular-nums">
                       {formatRupiah(selectedProduct.harga_jual)}
                     </p>
                   </div>
                   {canSeeModal && (
                     <div className="rounded-xl border border-border p-3">
-                      <p className="text-xs text-muted-foreground">Harga Modal</p>
-                      <p className="mt-0.5 text-sm font-semibold text-foreground">
+                      <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                        Harga Modal
+                      </p>
+                      <p className="mt-1 text-lg font-bold tracking-tight text-foreground tabular-nums">
                         {formatRupiah(selectedProduct.harga_modal)}
                       </p>
                     </div>
                   )}
                   <div className="rounded-xl border border-border p-3">
-                    <p className="text-xs text-muted-foreground">Stok Saat Ini</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">
+                    <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      Stok Saat Ini
+                    </p>
+                    <p className="mt-1 text-lg font-bold tracking-tight text-foreground tabular-nums">
                       {selectedProduct.stok} pcs
                     </p>
                   </div>
                   <div className="rounded-xl border border-border p-3">
-                    <p className="text-xs text-muted-foreground">Stok Minimum</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">
+                    <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      Stok Minimum
+                    </p>
+                    <p className="mt-1 text-lg font-bold tracking-tight text-foreground tabular-nums">
                       {selectedProduct.stok_min} pcs
                     </p>
                   </div>
@@ -520,7 +528,7 @@ export default function Stok() {
                 <div>
                   <div className="flex items-center gap-2">
                     <ClockCounterClockwise size={16} weight="bold" className="text-foreground" />
-                    <h3 className="text-sm font-medium text-foreground">Riwayat Pergerakan</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Riwayat Pergerakan</h3>
                   </div>
                   <div className="mt-2 flex flex-col gap-0">
                     {!movements || movements.length === 0 ? (
@@ -783,7 +791,7 @@ export default function Stok() {
                     type="button"
                     onClick={() => switchBarcodeMode('auto')}
                     className={cn(
-                      'rounded-4xl px-2.5 py-1 font-medium transition-colors',
+                      'rounded-4xl px-2.5 py-1 font-semibold transition-colors',
                       barcodeMode === 'auto'
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground',
@@ -795,7 +803,7 @@ export default function Stok() {
                     type="button"
                     onClick={() => switchBarcodeMode('manual')}
                     className={cn(
-                      'rounded-4xl px-2.5 py-1 font-medium transition-colors',
+                      'rounded-4xl px-2.5 py-1 font-semibold transition-colors',
                       barcodeMode === 'manual'
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground',
@@ -810,7 +818,7 @@ export default function Stok() {
                   <div className="mt-1.5 flex items-center gap-2">
                     <div
                       id="create-barcode"
-                      className="flex h-11 flex-1 items-center rounded-sm border border-input bg-muted px-2.5 text-sm text-foreground tabular-nums"
+                      className="flex h-11 flex-1 items-center rounded-md border border-input bg-muted px-3 text-sm text-foreground tabular-nums"
                     >
                       {createBarcode || 'Membuat barcode…'}
                     </div>
