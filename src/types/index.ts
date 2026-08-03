@@ -31,6 +31,8 @@ export interface Product {
   id: string
   barcode: string
   nama: string
+  /** Free-text product type, e.g. "Original", "KW Super" — optional, separate from category_id. */
+  tipe: string | null
   category_id: string
   harga_modal: number
   harga_jual: number

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   ArrowCircleDown,
   ArrowCircleUp,
   ArrowsClockwise,
+  Camera,
   CaretRight,
   ClockCounterClockwise,
   MagnifyingGlass,
@@ -54,6 +55,7 @@ import { useAddStockMovement, useStockMovements } from '@/hooks/useStockMovement
 import { useSessionStore } from '@/store/session'
 import { getUsers } from '@/lib/api'
 import { getStockStatus, stockStatusLabel } from '@/lib/stock'
+import { fileToCompressedDataUrl } from '@/lib/image'
 import { cn } from '@/lib/utils'
 import { BarcodeLabel } from '@/components/BarcodeLabel'
 import { CategoryManager } from '@/components/CategoryManager'
@@ -94,6 +96,85 @@ const adjustReasonSign: Record<AdjustReason, 1 | -1> = {
   koreksi_kurang: -1,
 }
 
+/** Shared upload control for the create/edit product dialogs — preview, upload, and remove. */
+function ProductPhotoField({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string | null
+  onChange: (dataUrl: string | null) => void
+  disabled?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar')
+      return
+    }
+    setIsProcessing(true)
+    try {
+      onChange(await fileToCompressedDataUrl(file))
+    } catch (err) {
+      toast.error('Gagal memproses foto', {
+        description: err instanceof Error ? err.message : 'Terjadi kesalahan tak terduga.',
+      })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  return (
+    <div>
+      <Label>Foto Produk</Label>
+      <div className="mt-1.5 flex items-center gap-3">
+        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+          {value ? (
+            <img src={value} alt="" className="size-full object-cover" />
+          ) : (
+            <Camera size={22} weight="bold" className="text-muted-foreground" />
+          )}
+        </div>
+        <div className="flex flex-1 gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => inputRef.current?.click()}
+            disabled={disabled || isProcessing}
+          >
+            {isProcessing ? 'Memproses…' : value ? 'Ganti Foto' : 'Unggah Foto'}
+          </Button>
+          {value && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onChange(null)}
+              disabled={disabled || isProcessing}
+              className="text-destructive"
+            >
+              Hapus
+            </Button>
+          )}
+        </div>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+    </div>
+  )
+}
+
 export default function Stok() {
   const currentRole = useSessionStore((s) => s.currentRole)
   const currentUserName = useSessionStore((s) => s.currentUserName)
@@ -130,14 +211,17 @@ export default function Stok() {
 
   const [editOpen, setEditOpen] = useState(false)
   const [editNama, setEditNama] = useState('')
+  const [editTipe, setEditTipe] = useState('')
   const [editHargaModal, setEditHargaModal] = useState('')
   const [editHargaJual, setEditHargaJual] = useState('')
   const [editStok, setEditStok] = useState('')
+  const [editFotoUrl, setEditFotoUrl] = useState<string | null>(null)
 
   const [barcodeOpen, setBarcodeOpen] = useState(false)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [createNama, setCreateNama] = useState('')
+  const [createTipe, setCreateTipe] = useState('')
   const [createBarcode, setCreateBarcode] = useState('')
   const [barcodeMode, setBarcodeMode] = useState<'auto' | 'manual'>('auto')
   const [createCategoryId, setCreateCategoryId] = useState('')
@@ -145,6 +229,7 @@ export default function Stok() {
   const [createHargaJual, setCreateHargaJual] = useState('')
   const [createStok, setCreateStok] = useState('0')
   const [createStokMin, setCreateStokMin] = useState('5')
+  const [createFotoUrl, setCreateFotoUrl] = useState<string | null>(null)
   const createProduct = useCreateProduct()
   const generateBarcode = useGenerateBarcode()
 
@@ -166,11 +251,13 @@ export default function Stok() {
 
   function openCreateDialog() {
     setCreateNama('')
+    setCreateTipe('')
     setCreateCategoryId(categories?.[0]?.id ?? '')
     setCreateHargaModal('')
     setCreateHargaJual('')
     setCreateStok('0')
     setCreateStokMin('5')
+    setCreateFotoUrl(null)
     setBarcodeMode('auto')
     setCreateOpen(true)
     regenerateBarcode()
@@ -217,6 +304,7 @@ export default function Stok() {
     try {
       await createProduct.mutateAsync({
         nama,
+        tipe: createTipe.trim() || null,
         barcode,
         category_id: createCategoryId,
         harga_modal: hargaModal,
@@ -224,6 +312,7 @@ export default function Stok() {
         stok,
         stok_min: stokMin,
         user_id: currentUser.id,
+        foto_url: createFotoUrl,
       })
       toast.success('Produk ditambahkan', { description: nama })
       setCreateOpen(false)
@@ -237,9 +326,11 @@ export default function Stok() {
   function openEditDialog() {
     if (!selectedProduct) return
     setEditNama(selectedProduct.nama)
+    setEditTipe(selectedProduct.tipe ?? '')
     setEditHargaModal(String(selectedProduct.harga_modal))
     setEditHargaJual(String(selectedProduct.harga_jual))
     setEditStok(String(selectedProduct.stok))
+    setEditFotoUrl(selectedProduct.foto_url)
     setEditOpen(true)
   }
 
@@ -270,8 +361,10 @@ export default function Stok() {
       await updateProduct.mutateAsync({
         id: selectedProduct.id,
         nama,
+        tipe: editTipe.trim() || null,
         harga_modal: hargaModal,
         harga_jual: hargaJual,
+        foto_url: editFotoUrl,
       })
 
       const stokDelta = stokBaru - selectedProduct.stok
@@ -435,6 +528,17 @@ export default function Stok() {
                       onClick={() => setSelectedProductId(product.id)}
                       className="flex w-full items-center gap-3 py-2.5 text-left"
                     >
+                      <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+                        {product.foto_url ? (
+                          <img
+                            src={product.foto_url}
+                            alt=""
+                            className="size-full object-cover"
+                          />
+                        ) : (
+                          <Package size={18} weight="bold" className="text-muted-foreground" />
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">
                           {product.nama}
@@ -463,10 +567,22 @@ export default function Stok() {
             <>
               <SheetHeader>
                 <SheetTitle>{selectedProduct.nama}</SheetTitle>
-                <SheetDescription>Barcode {selectedProduct.barcode}</SheetDescription>
+                <SheetDescription>
+                  Barcode {selectedProduct.barcode}
+                  {selectedProduct.tipe ? ` · ${selectedProduct.tipe}` : ''}
+                </SheetDescription>
               </SheetHeader>
 
               <div className="flex flex-col gap-4 px-4 pb-4">
+                {selectedProduct.foto_url && (
+                  <div className="overflow-hidden rounded-xl border border-border bg-muted">
+                    <img
+                      src={selectedProduct.foto_url}
+                      alt={selectedProduct.nama}
+                      className="h-48 w-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-xl border border-border p-3">
                     <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
@@ -684,6 +800,17 @@ export default function Stok() {
                 onChange={(e) => setEditNama(e.target.value)}
               />
             </div>
+            <div>
+              <Label htmlFor="edit-tipe">Tipe Produk</Label>
+              <Input
+                id="edit-tipe"
+                className="mt-1.5"
+                value={editTipe}
+                onChange={(e) => setEditTipe(e.target.value)}
+                placeholder="Mis. Original, KW Super (opsional)"
+              />
+            </div>
+            <ProductPhotoField value={editFotoUrl} onChange={setEditFotoUrl} />
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="edit-modal">Harga Modal</Label>
@@ -783,6 +910,17 @@ export default function Stok() {
                 placeholder="Mis. Casing Silikon iPhone 15"
               />
             </div>
+            <div>
+              <Label htmlFor="create-tipe">Tipe Produk</Label>
+              <Input
+                id="create-tipe"
+                className="mt-1.5"
+                value={createTipe}
+                onChange={(e) => setCreateTipe(e.target.value)}
+                placeholder="Mis. Original, KW Super (opsional)"
+              />
+            </div>
+            <ProductPhotoField value={createFotoUrl} onChange={setCreateFotoUrl} />
             <div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="create-barcode">Barcode</Label>

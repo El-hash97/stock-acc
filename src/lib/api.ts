@@ -243,12 +243,14 @@ export async function generateBarcode(): Promise<string> {
 export interface CreateProductInput {
   barcode: string
   nama: string
+  tipe?: string | null
   category_id: string
   harga_modal: number
   harga_jual: number
   stok: number
   stok_min: number
   user_id: string
+  foto_url?: string | null
 }
 
 export async function createProduct(input: CreateProductInput): Promise<Product> {
@@ -260,12 +262,13 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
     id: generateId('prod'),
     barcode: input.barcode,
     nama: input.nama,
+    tipe: input.tipe ?? null,
     category_id: input.category_id,
     harga_modal: input.harga_modal,
     harga_jual: input.harga_jual,
     stok: input.stok,
     stok_min: input.stok_min,
-    foto_url: null,
+    foto_url: input.foto_url ?? null,
     status: 'aktif',
   }
   store.products.push(product)
@@ -315,19 +318,23 @@ export async function updateCategory(input: UpdateCategoryInput): Promise<Catego
 export interface UpdateProductInput {
   id: string
   nama?: string
+  tipe?: string | null
   harga_modal?: number
   harga_jual?: number
+  foto_url?: string | null
 }
 
-/** Edits product identity/pricing fields. Stock stays derived from stock_movements — use addStockMovement for stock changes. */
+/** Edits product identity/pricing/photo fields. Stock stays derived from stock_movements — use addStockMovement for stock changes. */
 export async function updateProduct(input: UpdateProductInput): Promise<Product> {
   const product = store.products.find((p) => p.id === input.id)
   if (!product) {
     throw new Error(`Produk dengan id "${input.id}" tidak ditemukan`)
   }
   if (input.nama !== undefined) product.nama = input.nama
+  if (input.tipe !== undefined) product.tipe = input.tipe
   if (input.harga_modal !== undefined) product.harga_modal = input.harga_modal
   if (input.harga_jual !== undefined) product.harga_jual = input.harga_jual
+  if (input.foto_url !== undefined) product.foto_url = input.foto_url
 
   persist()
   return delay({ ...product })
