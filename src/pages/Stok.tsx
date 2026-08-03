@@ -139,6 +139,7 @@ export default function Stok() {
   const [createOpen, setCreateOpen] = useState(false)
   const [createNama, setCreateNama] = useState('')
   const [createBarcode, setCreateBarcode] = useState('')
+  const [barcodeMode, setBarcodeMode] = useState<'auto' | 'manual'>('auto')
   const [createCategoryId, setCreateCategoryId] = useState('')
   const [createHargaModal, setCreateHargaModal] = useState('')
   const [createHargaJual, setCreateHargaJual] = useState('')
@@ -154,6 +155,15 @@ export default function Stok() {
     })
   }
 
+  function switchBarcodeMode(mode: 'auto' | 'manual') {
+    setBarcodeMode(mode)
+    if (mode === 'manual') {
+      setCreateBarcode('')
+    } else {
+      regenerateBarcode()
+    }
+  }
+
   function openCreateDialog() {
     setCreateNama('')
     setCreateCategoryId(categories?.[0]?.id ?? '')
@@ -161,6 +171,7 @@ export default function Stok() {
     setCreateHargaJual('')
     setCreateStok('0')
     setCreateStokMin('5')
+    setBarcodeMode('auto')
     setCreateOpen(true)
     regenerateBarcode()
   }
@@ -182,7 +193,12 @@ export default function Stok() {
       return
     }
     if (!barcode) {
-      toast.error('Barcode belum siap', { description: 'Tunggu sebentar atau tekan acak ulang.' })
+      toast.error('Barcode belum siap', {
+        description:
+          barcodeMode === 'manual'
+            ? 'Ketik barcode produk terlebih dahulu.'
+            : 'Tunggu sebentar atau tekan acak ulang.',
+      })
       return
     }
     if (!createCategoryId) {
@@ -760,28 +776,74 @@ export default function Stok() {
               />
             </div>
             <div>
-              <Label htmlFor="create-barcode">Barcode</Label>
-              <div className="mt-1.5 flex items-center gap-2">
-                <div
-                  id="create-barcode"
-                  className="flex h-11 flex-1 items-center rounded-sm border border-input bg-muted px-2.5 text-sm text-foreground tabular-nums"
-                >
-                  {createBarcode || 'Membuat barcode…'}
+              <div className="flex items-center justify-between">
+                <Label htmlFor="create-barcode">Barcode</Label>
+                <div className="flex gap-1 rounded-4xl border border-border p-0.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => switchBarcodeMode('auto')}
+                    className={cn(
+                      'rounded-4xl px-2.5 py-1 font-medium transition-colors',
+                      barcodeMode === 'auto'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground',
+                    )}
+                  >
+                    Otomatis
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchBarcodeMode('manual')}
+                    className={cn(
+                      'rounded-4xl px-2.5 py-1 font-medium transition-colors',
+                      barcodeMode === 'manual'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground',
+                    )}
+                  >
+                    Manual
+                  </button>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={regenerateBarcode}
-                  disabled={generateBarcode.isPending}
-                  aria-label="Acak ulang barcode"
-                >
-                  <ArrowsClockwise size={18} weight="bold" />
-                </Button>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Dibuat otomatis agar tidak bentrok dengan barcode produk lain.
-              </p>
+              {barcodeMode === 'auto' ? (
+                <>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <div
+                      id="create-barcode"
+                      className="flex h-11 flex-1 items-center rounded-sm border border-input bg-muted px-2.5 text-sm text-foreground tabular-nums"
+                    >
+                      {createBarcode || 'Membuat barcode…'}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={regenerateBarcode}
+                      disabled={generateBarcode.isPending}
+                      aria-label="Acak ulang barcode"
+                    >
+                      <ArrowsClockwise size={18} weight="bold" />
+                    </Button>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Dibuat otomatis agar tidak bentrok dengan barcode produk lain.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Input
+                    id="create-barcode"
+                    className="mt-1.5"
+                    inputMode="numeric"
+                    value={createBarcode}
+                    onChange={(e) => setCreateBarcode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Ketik barcode dari kemasan produk"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Untuk produk yang sudah punya barcode dari pabrik/kemasan.
+                  </p>
+                </>
+              )}
             </div>
             <div>
               <Label htmlFor="create-kategori">Kategori</Label>
