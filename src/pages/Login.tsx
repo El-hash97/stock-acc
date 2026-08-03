@@ -46,19 +46,19 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-background px-5 py-10">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-background px-5 py-12">
       <div className="w-full max-w-sm">
-        <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-4 flex size-14 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Storefront size={28} weight="fill" />
+        <div className="mb-12 flex flex-col items-center text-center">
+          <div className="mb-5 flex size-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Storefront size={30} weight="fill" />
           </div>
-          <h1 className="text-lg font-semibold text-foreground">Konter</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Konter</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Monitoring Penjualan &amp; Stok Aksesoris
           </p>
         </div>
 
-        <p className="mb-3 px-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="mb-3 px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
           Masuk sebagai
         </p>
 
@@ -70,9 +70,9 @@ export default function Login() {
                 key={option.role}
                 type="button"
                 onClick={() => handleSelect(option)}
-                className="flex min-h-[76px] items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-left transition-colors active:bg-muted hover:border-brand-light hover:bg-secondary/40"
+                className="flex min-h-[80px] items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors active:bg-muted hover:border-brand-light hover:bg-secondary/40"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                   <OptionIcon size={22} weight="bold" />
                 </div>
                 <div className="min-w-0 flex-1">
