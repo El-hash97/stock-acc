@@ -50,7 +50,7 @@ export default function AppShell() {
     <div className="flex min-h-svh flex-col bg-background">
       <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80">
         <div className="flex flex-col leading-tight">
-          <span className="text-sm font-semibold text-foreground">
+          <span className="text-sm font-semibold tracking-tight text-foreground">
             {activeTab?.label ?? 'Konter'}
           </span>
           {currentRole && (
@@ -63,7 +63,7 @@ export default function AppShell() {
           type="button"
           onClick={handleLogout}
           aria-label="Keluar"
-          className="flex size-11 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <SignOut size={20} weight="bold" />
         </button>
@@ -86,10 +86,10 @@ export default function AppShell() {
                 <button
                   type="button"
                   onClick={() => navigate(tab.to)}
-                  className="relative flex w-full min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-medium"
+                  className="relative flex w-full min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-xs font-semibold"
                 >
                   {isActive && (
-                    <span className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-primary" />
+                    <span className="absolute inset-x-6 top-0 h-[3px] rounded-full bg-primary" />
                   )}
                   <TabIcon
                     size={24}
