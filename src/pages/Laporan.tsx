@@ -87,7 +87,7 @@ export default function Laporan() {
 
   return (
     <div className="px-4 py-6">
-      <h1 className="text-xl font-semibold text-foreground">Laporan</h1>
+      <h1 className="text-xl font-bold tracking-tight text-foreground">Laporan</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {isOwner
           ? 'Ringkasan penjualan, produk terlaris, dan profit toko.'
@@ -104,17 +104,21 @@ export default function Laporan() {
         <TabsContent value="penjualan" className="mt-4 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Omzet 7 Hari</p>
-                <p className="text-lg font-semibold text-foreground">
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Omzet 7 Hari
+                </p>
+                <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
                   {isLoading ? 'Memuat…' : formatRupiah(totalOmzet7d)}
                 </p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Transaksi 7 Hari</p>
-                <p className="text-lg font-semibold text-foreground">
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Transaksi 7 Hari
+                </p>
+                <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
                   {isLoading ? 'Memuat…' : totalTransaksi7d}
                 </p>
               </CardContent>
@@ -125,7 +129,7 @@ export default function Laporan() {
             <CardContent className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <ChartBar size={16} weight="bold" className="text-foreground" />
-                <h2 className="text-sm font-medium text-foreground">Penjualan Harian</h2>
+                <h2 className="text-sm font-semibold text-foreground">Penjualan Harian</h2>
               </div>
               <LaporanSalesChart data={salesData} isLoading={isTxLoading} />
             </CardContent>
@@ -137,7 +141,7 @@ export default function Laporan() {
             <CardContent className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <TrendUp size={16} weight="bold" className="text-foreground" />
-                <h2 className="text-sm font-medium text-foreground">Produk Terlaris (7 Hari)</h2>
+                <h2 className="text-sm font-semibold text-foreground">Produk Terlaris (7 Hari)</h2>
               </div>
               <LaporanTopProducts items={topProducts} isLoading={isItemsLoading || isProductsLoading} />
             </CardContent>
@@ -148,17 +152,21 @@ export default function Laporan() {
           <TabsContent value="profit" className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3">
               <Card>
-                <CardContent className="flex flex-col gap-1">
-                  <p className="text-xs text-muted-foreground">Laba 7 Hari</p>
-                  <p className="text-lg font-semibold text-foreground">
+                <CardContent className="flex flex-col gap-1.5">
+                  <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Laba 7 Hari
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-primary tabular-nums">
                     {isLoading ? 'Memuat…' : formatRupiah(profit7d)}
                   </p>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="flex flex-col gap-1">
-                  <p className="text-xs text-muted-foreground">Nilai Stok (Modal)</p>
-                  <p className="text-lg font-semibold text-foreground">
+                <CardContent className="flex flex-col gap-1.5">
+                  <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Nilai Stok (Modal)
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
                     {isProductsLoading ? 'Memuat…' : formatRupiah(nilaiStok)}
                   </p>
                 </CardContent>
@@ -167,7 +175,7 @@ export default function Laporan() {
 
             <Card>
               <CardContent className="flex items-start gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                   <CurrencyCircleDollar size={18} weight="bold" />
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -179,7 +187,7 @@ export default function Laporan() {
 
             <Card>
               <CardContent className="flex items-start gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                   <Package size={18} weight="bold" />
                 </div>
                 <p className="text-xs text-muted-foreground">

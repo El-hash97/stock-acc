@@ -47,7 +47,7 @@ export function LaporanTopProducts({
           <div className="flex items-center gap-3 py-2.5">
             <div
               className={cn(
-                'flex size-7 shrink-0 items-center justify-center rounded-sm text-xs font-semibold',
+                'flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-semibold',
                 rankBadgeClass[idx] ?? 'bg-muted text-muted-foreground',
               )}
             >

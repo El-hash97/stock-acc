@@ -27,8 +27,8 @@ function ChartTooltip({
   if (!active || !payload || payload.length === 0) return null
   const point = payload[0].payload
   return (
-    <div className="rounded-sm border border-border bg-popover px-2.5 py-1.5 text-xs shadow-sm">
-      <p className="font-medium text-popover-foreground">{point.label}</p>
+    <div className="rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs shadow-sm">
+      <p className="font-semibold text-popover-foreground">{point.label}</p>
       <p className="text-muted-foreground">{formatRupiah(point.total)}</p>
     </div>
   )
