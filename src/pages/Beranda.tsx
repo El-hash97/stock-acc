@@ -60,7 +60,7 @@ export default function Beranda() {
     <div className="px-4 py-6">
       {/* Greeting */}
       <div>
-        <h1 className="text-lg font-semibold text-foreground">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
           Halo, {currentUserName ?? 'Pengguna'}
         </h1>
         <p className="mt-0.5 text-sm text-muted-foreground">{roleLabel[role]}</p>
@@ -73,11 +73,11 @@ export default function Beranda() {
             to="/jual"
             className="flex items-center gap-3 rounded-xl border border-border bg-primary p-4 text-primary-foreground transition-colors active:bg-primary/90"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-sm bg-primary-foreground/15">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/15">
               <Scan size={20} weight="bold" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">Scan &amp; Jual</p>
+              <p className="text-sm font-semibold">Scan &amp; Jual</p>
               <p className="text-xs text-primary-foreground/80">Transaksi baru</p>
             </div>
             <ArrowRight size={16} weight="bold" className="shrink-0 opacity-80" />
@@ -93,14 +93,14 @@ export default function Beranda() {
           >
             <div
               className={cn(
-                'flex size-10 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary',
+                'flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary',
                 !showJualShortcut && 'bg-primary-foreground/15 text-primary-foreground',
               )}
             >
               <Package size={20} weight="bold" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">Kelola Stok</p>
+              <p className="text-sm font-semibold">Kelola Stok</p>
               <p
                 className={cn(
                   'text-xs text-muted-foreground',
@@ -119,22 +119,26 @@ export default function Beranda() {
         )}
       </div>
 
-      {/* Summary stats */}
+      {/* Summary stats (bento) */}
       <div className="mt-5">
         {role === 'staff_gudang' ? (
           <div className="grid grid-cols-2 gap-3">
             <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Produk Menipis</p>
-                <p className="text-2xl font-semibold text-status-menipis-fg">
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Produk Menipis
+                </p>
+                <p className="text-3xl font-bold tracking-tight text-status-menipis-fg tabular-nums">
                   {isSummaryLoading ? '—' : (summary?.produk_menipis ?? 0)}
                 </p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Produk Habis</p>
-                <p className="text-2xl font-semibold text-status-habis-fg">
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Produk Habis
+                </p>
+                <p className="text-3xl font-bold tracking-tight text-status-habis-fg tabular-nums">
                   {isSummaryLoading ? '—' : (summary?.produk_habis ?? 0)}
                 </p>
               </CardContent>
@@ -142,27 +146,33 @@ export default function Beranda() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Penjualan Hari Ini</p>
-                <p className="text-xl font-semibold text-foreground">
+            <Card className="col-span-2">
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Penjualan Hari Ini
+                </p>
+                <p className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
                   {isSummaryLoading ? 'Memuat…' : formatRupiah(summary?.penjualan_hari_ini ?? 0)}
                 </p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Transaksi Hari Ini</p>
-                <p className="text-xl font-semibold text-foreground">
+            <Card className={cn(role !== 'owner' && 'col-span-2')}>
+              <CardContent className="flex flex-col gap-1.5">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  Transaksi Hari Ini
+                </p>
+                <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
                   {isSummaryLoading ? 'Memuat…' : (summary?.transaksi_hari_ini ?? 0)}
                 </p>
               </CardContent>
             </Card>
             {role === 'owner' && (
-              <Card className="col-span-2">
-                <CardContent className="flex flex-col gap-1">
-                  <p className="text-xs text-muted-foreground">Laba Hari Ini</p>
-                  <p className="text-xl font-semibold text-foreground">
+              <Card>
+                <CardContent className="flex flex-col gap-1.5">
+                  <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Laba Hari Ini
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-primary tabular-nums">
                     {isSummaryLoading ? 'Memuat…' : formatRupiah(summary?.laba_hari_ini ?? 0)}
                   </p>
                 </CardContent>
@@ -179,7 +189,7 @@ export default function Beranda() {
             <div className="flex items-start gap-2.5">
               <Warning size={20} weight="bold" className="mt-0.5 shrink-0 text-status-menipis-fg" />
               <div>
-                <p className="text-sm font-medium text-status-menipis-fg">
+                <p className="text-sm font-semibold text-status-menipis-fg">
                   {lowStockCount} produk perlu restock
                 </p>
                 <p className="text-xs text-status-menipis-fg/80">
@@ -189,7 +199,7 @@ export default function Beranda() {
             </div>
 
             {!isLowStockLoading && lowStockProducts && lowStockProducts.length > 0 && (
-              <div className="flex flex-col gap-2 rounded-sm bg-background/60 p-2.5">
+              <div className="flex flex-col gap-2 rounded-lg bg-background/60 p-2.5">
                 {lowStockProducts.slice(0, 4).map((product) => {
                   const status = getStockStatus(product)
                   return (
@@ -215,7 +225,7 @@ export default function Beranda() {
       {/* Recent activity */}
       {showActivity && (
         <div className="mt-5">
-          <h2 className="text-sm font-medium text-foreground">Aktivitas Terbaru</h2>
+          <h2 className="text-sm font-semibold text-foreground">Aktivitas Terbaru</h2>
           <Card className="mt-2">
             <CardContent className="flex flex-col gap-0">
               {isActivityLoading ? (
@@ -225,7 +235,7 @@ export default function Beranda() {
                   <div key={tx.id}>
                     {idx > 0 && <Separator />}
                     <div className="flex items-center gap-3 py-2.5">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-secondary text-primary">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                         <Receipt size={16} weight="bold" />
                       </div>
                       <div className="min-w-0 flex-1">
