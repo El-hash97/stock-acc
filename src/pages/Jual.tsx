@@ -168,7 +168,7 @@ export default function Jual() {
 
   return (
     <div className="px-4 py-6 pb-28">
-      <h1 className="text-xl font-semibold text-foreground">Jual</h1>
+      <h1 className="text-xl font-bold tracking-tight text-foreground">Jual</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Scan barcode produk, lalu proses pembayaran.
       </p>
@@ -192,7 +192,7 @@ export default function Jual() {
       </form>
 
       <div className="mt-6">
-        <h2 className="text-sm font-medium text-foreground">
+        <h2 className="text-sm font-semibold text-foreground">
           Keranjang{cart.length > 0 ? ` (${cart.length})` : ''}
         </h2>
         <Card className="mt-2">
@@ -263,8 +263,8 @@ export default function Jual() {
       </div>
 
       {cart.length > 0 && (
-        <div className="fixed inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-30 border-t border-border bg-background px-4 py-3">
-          <Button type="button" className="w-full justify-between" size="lg" onClick={handleOpenCheckout}>
+        <div className="fixed inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-30 border-t border-border bg-background px-4 py-3 shadow-[0_-1px_2px_rgba(0,0,0,0.04)]">
+          <Button type="button" className="w-full justify-between text-base" size="lg" onClick={handleOpenCheckout}>
             <span>Bayar</span>
             <span>{formatRupiah(cartTotal)}</span>
           </Button>
@@ -323,13 +323,13 @@ export default function Jual() {
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Total</span>
-              <span className="font-medium text-foreground">{formatRupiah(cartTotal)}</span>
+              <span className="font-semibold text-foreground">{formatRupiah(cartTotal)}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Kembalian</span>
               <span
                 className={cn(
-                  'font-medium',
+                  'font-semibold',
                   kembalian > 0 ? 'text-status-aman-fg' : 'text-foreground',
                 )}
               >
