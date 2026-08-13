@@ -217,3 +217,4 @@ Tidak ada test suite otomatis di repo ini. Validasi dilakukan lewat:
   yang dipertimbangkan, tidak dipakai (lihat tabel keputusan di atas).
 - Export PDF/Excel laporan, cetak barcode fisik, manajemen supplier (Fase 2
   PRD; cetak barcode di UI sudah ada di frontend, tidak berubah).
+

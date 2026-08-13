@@ -25,3 +25,8 @@ dist-ssr
 
 # Git worktrees (isolated agent workspaces)
 .worktrees/
+
+# Local CLI tool artifacts (Neon CLI, agent skill installer)
+.neon
+.agents/
+skills-lock.json
