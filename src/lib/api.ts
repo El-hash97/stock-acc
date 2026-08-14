@@ -200,3 +200,11 @@ export async function addStockMovement(input: AddStockMovementInput): Promise<St
     body: JSON.stringify(input),
   })
 }
+
+/** Owner-only: sets a new password for the given user, bypassing the old one. */
+export async function resetUserPassword(userId: string, newPassword: string): Promise<PublicUser> {
+  return request<PublicUser>(`/users?id=${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ password: newPassword }),
+  })
+}

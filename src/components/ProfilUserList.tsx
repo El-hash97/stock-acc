@@ -5,10 +5,19 @@ import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { getUsers } from '@/lib/api'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { getUsers, resetUserPassword } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import type { ActiveStatus, Role } from '@/types'
+import type { ActiveStatus, PublicUser, Role } from '@/types'
 
 const roleLabel: Record<Role, string> = {
   owner: 'Owner / Admin',
@@ -44,6 +53,9 @@ interface ProfilUserListProps {
 export default function ProfilUserList({ currentUserName }: ProfilUserListProps) {
   const { data: users, isLoading } = useQuery({ queryKey: ['users'], queryFn: getUsers })
   const [statusOverrides, setStatusOverrides] = useState<Record<string, ActiveStatus>>({})
+  const [resetTarget, setResetTarget] = useState<PublicUser | null>(null)
+  const [newPassword, setNewPassword] = useState('')
+  const [isResetting, setIsResetting] = useState(false)
 
   function toggleStatus(userId: string, current: ActiveStatus) {
     const next: ActiveStatus = current === 'aktif' ? 'nonaktif' : 'aktif'
@@ -51,6 +63,31 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
     toast(next === 'aktif' ? 'Pengguna diaktifkan' : 'Pengguna dinonaktifkan', {
       description: 'Perubahan ini hanya berlaku untuk sesi ini (belum tersambung ke backend).',
     })
+  }
+
+  function openResetDialog(user: PublicUser) {
+    setResetTarget(user)
+    setNewPassword('')
+  }
+
+  async function handleResetPassword() {
+    if (!resetTarget) return
+    if (newPassword.length < 6) {
+      toast.error('Password baru minimal 6 karakter')
+      return
+    }
+
+    setIsResetting(true)
+    try {
+      await resetUserPassword(resetTarget.id, newPassword)
+      toast.success(`Password ${resetTarget.nama} berhasil direset`)
+      setResetTarget(null)
+      setNewPassword('')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Gagal reset password')
+    } finally {
+      setIsResetting(false)
+    }
   }
 
   if (isLoading) {
@@ -74,6 +111,7 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
   }
 
   return (
+    <>
     <Card>
       <CardContent className="flex flex-col gap-0">
         {users.map((user, idx) => {
@@ -110,6 +148,14 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
                   >
                     {effectiveStatus === 'aktif' ? 'Nonaktifkan' : 'Aktifkan'}
                   </Button>
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="outline"
+                    onClick={() => openResetDialog(user)}
+                  >
+                    Reset Password
+                  </Button>
                 </div>
               </div>
             </div>
@@ -117,5 +163,42 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
         })}
       </CardContent>
     </Card>
+
+    <Dialog open={resetTarget !== null} onOpenChange={(open) => { if (!open) setResetTarget(null) }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset Password</DialogTitle>
+          <DialogDescription>
+            Atur password baru untuk {resetTarget?.nama}. User ini perlu login ulang memakai
+            password baru.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="new-password"
+            className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+          >
+            Password baru
+          </label>
+          <Input
+            id="new-password"
+            type="password"
+            autoComplete="new-password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Minimal 6 karakter"
+          />
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setResetTarget(null)}>
+            Batal
+          </Button>
+          <Button type="button" disabled={isResetting} onClick={handleResetPassword}>
+            {isResetting ? 'Menyimpan...' : 'Simpan'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }
