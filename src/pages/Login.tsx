@@ -1,48 +1,36 @@
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Storefront, Crown, Coins, Warehouse, CaretRight } from '@phosphor-icons/react'
-import type { Icon } from '@phosphor-icons/react'
+import { Storefront } from '@phosphor-icons/react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { login as loginRequest } from '@/lib/api'
 import { useSessionStore } from '@/store/session'
-import type { Role } from '@/types'
-
-interface RoleOption {
-  role: Role
-  name: string
-  title: string
-  description: string
-  icon: Icon
-}
-
-const ROLE_OPTIONS: RoleOption[] = [
-  {
-    role: 'owner',
-    name: 'Budi Santoso',
-    title: 'Owner / Admin',
-    description: 'Akses penuh: kelola produk, transaksi, stok, laporan, dan pengguna.',
-    icon: Crown,
-  },
-  {
-    role: 'kasir',
-    name: 'Sari Wulandari',
-    title: 'Kasir',
-    description: 'Proses transaksi penjualan dan lihat laporan penjualan harian.',
-    icon: Coins,
-  },
-  {
-    role: 'staff_gudang',
-    name: 'Andi Prasetyo',
-    title: 'Staff Gudang',
-    description: 'Kelola stok barang: tambah, kurangi, dan sesuaikan inventori.',
-    icon: Warehouse,
-  },
-]
 
 export default function Login() {
   const navigate = useNavigate()
   const login = useSessionStore((s) => s.login)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSelect(option: RoleOption) {
-    login(option.role, option.name)
-    navigate('/', { replace: true })
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    if (!username.trim() || !password) {
+      toast.error('Username dan password wajib diisi')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const result = await loginRequest(username.trim(), password)
+      login(result.token, result.user)
+      navigate('/', { replace: true })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Gagal masuk')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -58,39 +46,38 @@ export default function Login() {
           </p>
         </div>
 
-        <p className="mb-3 px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          Masuk sebagai
-        </p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="username" className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Username
+            </label>
+            <Input
+              id="username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="mis. budi.owner"
+            />
+          </div>
 
-        <div className="flex flex-col gap-3">
-          {ROLE_OPTIONS.map((option) => {
-            const OptionIcon = option.icon
-            return (
-              <button
-                key={option.role}
-                type="button"
-                onClick={() => handleSelect(option)}
-                className="flex min-h-[80px] items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors active:bg-muted hover:border-brand-light hover:bg-secondary/40"
-              >
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
-                  <OptionIcon size={22} weight="bold" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground">{option.title}</p>
-                  <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
-                    {option.description}
-                  </p>
-                </div>
-                <CaretRight size={18} weight="bold" className="shrink-0 text-muted-foreground" />
-              </button>
-            )
-          })}
-        </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="password" className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Masukkan password"
+            />
+          </div>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
-          Pemilihan peran ini sementara untuk pengembangan &mdash; akan diganti dengan
-          login sesungguhnya.
-        </p>
+          <Button type="submit" disabled={isSubmitting} className="mt-2 h-11">
+            {isSubmitting ? 'Memproses...' : 'Masuk'}
+          </Button>
+        </form>
       </div>
     </div>
   )
