@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { sql } from './_db'
-import { requireRole, ApiError } from './_auth'
-import { sendError, readBody } from './_http'
-import type { Category } from '../src/types'
+import { sql } from './_db.js'
+import { requireRole, ApiError } from './_auth.js'
+import { sendError, readBody } from './_http.js'
+import type { Category } from '../src/types/index.js'
 
 // Merged with the former api/categories/[id].ts (PATCH by id) so this
 // resource stays a single Vercel Function — Hobby plan caps deployments at

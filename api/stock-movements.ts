@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { sql } from './_db'
-import { requireRole, ApiError } from './_auth'
-import { sendError, readBody } from './_http'
-import type { StockMovement } from '../src/types'
+import { sql } from './_db.js'
+import { requireRole, ApiError } from './_auth.js'
+import { sendError, readBody } from './_http.js'
+import type { StockMovement } from '../src/types/index.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

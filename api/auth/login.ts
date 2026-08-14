@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import bcrypt from 'bcryptjs'
-import { sql } from '../_db'
-import { signToken } from '../_auth'
-import { sendError, readBody } from '../_http'
-import type { Role } from '../../src/types'
+import { sql } from '../_db.js'
+import { signToken } from '../_auth.js'
+import { sendError, readBody } from '../_http.js'
+import type { Role } from '../../src/types/index.js'
 
 interface LoginBody {
   username: string

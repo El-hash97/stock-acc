@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { ApiError } from './_auth'
+import { ApiError } from './_auth.js'
 
 /** Maps a thrown error to an HTTP response. Call from the catch block of every handler. */
 export function sendError(res: VercelResponse, err: unknown): void {

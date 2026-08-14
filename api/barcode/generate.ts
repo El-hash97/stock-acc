@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { sql } from '../_db'
-import { requireRole } from '../_auth'
-import { sendError } from '../_http'
+import { sql } from '../_db.js'
+import { requireRole } from '../_auth.js'
+import { sendError } from '../_http.js'
 
 function randomBarcodeCandidate(): string {
   const random = Math.floor(Math.random() * 1e10)

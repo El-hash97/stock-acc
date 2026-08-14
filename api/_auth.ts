@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import type { VercelRequest } from '@vercel/node'
-import type { Role } from '../src/types'
+import type { Role } from '../src/types/index.js'
 
 // See api/_db.ts for why this fallback load is needed under `vercel dev --local`.
 if (!process.env.JWT_SECRET) {

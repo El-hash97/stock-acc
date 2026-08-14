@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { sql, NeonDbError } from './_db'
-import { requireRole, ApiError } from './_auth'
-import { sendError, readBody } from './_http'
-import type { Product } from '../src/types'
+import { sql, NeonDbError } from './_db.js'
+import { requireRole, ApiError } from './_auth.js'
+import { sendError, readBody } from './_http.js'
+import type { Product } from '../src/types/index.js'
 
 // Merged with the former api/products/[id].ts, api/products/barcode/[barcode].ts,
 // and api/products/low-stock.ts so this resource stays a single Vercel
