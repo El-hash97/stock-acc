@@ -2,6 +2,15 @@ import jwt from 'jsonwebtoken'
 import type { VercelRequest } from '@vercel/node'
 import type { Role } from '../src/types'
 
+// See api/_db.ts for why this fallback load is needed under `vercel dev --local`.
+if (!process.env.JWT_SECRET) {
+  try {
+    process.loadEnvFile('.env.local')
+  } catch {
+    // .env.local not present — fine in deployed environments.
+  }
+}
+
 function requireEnv(name: string): string {
   const value = process.env[name]
   if (!value) {
