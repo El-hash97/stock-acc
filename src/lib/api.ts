@@ -208,3 +208,17 @@ export async function resetUserPassword(userId: string, newPassword: string): Pr
     body: JSON.stringify({ password: newPassword }),
   })
 }
+
+export interface UpdateUserInput {
+  id: string
+  nama?: string
+  username?: string
+}
+
+/** Owner-only: edits a user's nama/username. */
+export async function updateUser(input: UpdateUserInput): Promise<PublicUser> {
+  return request<PublicUser>(`/users?id=${input.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ nama: input.nama, username: input.username }),
+  })
+}

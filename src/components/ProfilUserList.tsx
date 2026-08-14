@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { getUsers, resetUserPassword } from '@/lib/api'
+import { getUsers, resetUserPassword, updateUser } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import type { ActiveStatus, PublicUser, Role } from '@/types'
 
@@ -43,19 +43,24 @@ interface ProfilUserListProps {
 /**
  * Owner-only user list for the Profil screen.
  *
- * There is no `updateUser` mutation in `@/lib/api` yet, and this component
- * is intentionally not allowed to add one. So the aktif/nonaktif toggle here
- * is implemented as local-only component state (an override map keyed by
- * user id) — it flips the badge for the rest of this session but is never
- * persisted to the mock store, and a toast makes that limitation explicit
- * each time a status is changed.
+ * There is no `updateUser`-status mutation in `@/lib/api` (only nama/username
+ * are editable server-side — see api/users.ts), so the aktif/nonaktif toggle
+ * here is still implemented as local-only component state (an override map
+ * keyed by user id) — it flips the badge for the rest of this session but is
+ * never persisted, and a toast makes that limitation explicit each time a
+ * status is changed.
  */
 export default function ProfilUserList({ currentUserName }: ProfilUserListProps) {
+  const queryClient = useQueryClient()
   const { data: users, isLoading } = useQuery({ queryKey: ['users'], queryFn: getUsers })
   const [statusOverrides, setStatusOverrides] = useState<Record<string, ActiveStatus>>({})
   const [resetTarget, setResetTarget] = useState<PublicUser | null>(null)
   const [newPassword, setNewPassword] = useState('')
   const [isResetting, setIsResetting] = useState(false)
+  const [editTarget, setEditTarget] = useState<PublicUser | null>(null)
+  const [editNama, setEditNama] = useState('')
+  const [editUsername, setEditUsername] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
 
   function toggleStatus(userId: string, current: ActiveStatus) {
     const next: ActiveStatus = current === 'aktif' ? 'nonaktif' : 'aktif'
@@ -87,6 +92,32 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
       toast.error(err instanceof Error ? err.message : 'Gagal reset password')
     } finally {
       setIsResetting(false)
+    }
+  }
+
+  function openEditDialog(user: PublicUser) {
+    setEditTarget(user)
+    setEditNama(user.nama)
+    setEditUsername(user.username)
+  }
+
+  async function handleEditUser() {
+    if (!editTarget) return
+    if (!editNama.trim() || !editUsername.trim()) {
+      toast.error('Nama dan username tidak boleh kosong')
+      return
+    }
+
+    setIsEditing(true)
+    try {
+      await updateUser({ id: editTarget.id, nama: editNama.trim(), username: editUsername.trim() })
+      toast.success('Data pengguna berhasil diperbarui')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      setEditTarget(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Gagal memperbarui pengguna')
+    } finally {
+      setIsEditing(false)
     }
   }
 
@@ -156,6 +187,14 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
                   >
                     Reset Password
                   </Button>
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="outline"
+                    onClick={() => openEditDialog(user)}
+                  >
+                    Edit
+                  </Button>
                 </div>
               </div>
             </div>
@@ -195,6 +234,45 @@ export default function ProfilUserList({ currentUserName }: ProfilUserListProps)
           </Button>
           <Button type="button" disabled={isResetting} onClick={handleResetPassword}>
             {isResetting ? 'Menyimpan...' : 'Simpan'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={editTarget !== null} onOpenChange={(open) => { if (!open) setEditTarget(null) }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Pengguna</DialogTitle>
+          <DialogDescription>Ubah nama dan username untuk {editTarget?.nama}.</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="edit-nama"
+            className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+          >
+            Nama
+          </label>
+          <Input id="edit-nama" value={editNama} onChange={(e) => setEditNama(e.target.value)} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="edit-username"
+            className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+          >
+            Username
+          </label>
+          <Input
+            id="edit-username"
+            value={editUsername}
+            onChange={(e) => setEditUsername(e.target.value)}
+          />
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setEditTarget(null)}>
+            Batal
+          </Button>
+          <Button type="button" disabled={isEditing} onClick={handleEditUser}>
+            {isEditing ? 'Menyimpan...' : 'Simpan'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import bcrypt from 'bcryptjs'
-import { sql } from './_db.js'
+import { sql, NeonDbError } from './_db.js'
 import { requireRole, ApiError } from './_auth.js'
 import { sendError, readBody } from './_http.js'
 import type { PublicUser } from '../src/types/index.js'
@@ -24,20 +24,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return
       }
 
-      const { password } = readBody<{ password: string }>(req)
-      if (!password || password.length < 6) {
+      const body = readBody<{ nama?: string; username?: string; password?: string }>(req)
+
+      if (body.nama !== undefined && !body.nama.trim()) {
+        res.status(400).json({ error: 'Nama tidak boleh kosong' })
+        return
+      }
+      if (body.username !== undefined && !body.username.trim()) {
+        res.status(400).json({ error: 'Username tidak boleh kosong' })
+        return
+      }
+      if (body.password !== undefined && body.password.length < 6) {
         res.status(400).json({ error: 'Password baru minimal 6 karakter' })
         return
       }
 
-      const passwordHash = await bcrypt.hash(password, 10)
-      const rows = (await sql`
-        update users set password_hash = ${passwordHash} where id = ${id}
-        returning id, nama, username, role, status, created_at
-      `) as PublicUser[]
-
-      if (!rows[0]) {
+      const existingRows = (await sql`
+        select nama, username, password_hash from users where id = ${id}
+      `) as { nama: string; username: string; password_hash: string }[]
+      const existing = existingRows[0]
+      if (!existing) {
         throw new ApiError(404, `Pengguna dengan id "${id}" tidak ditemukan`)
+      }
+
+      const nama = body.nama !== undefined ? body.nama.trim() : existing.nama
+      const username = body.username !== undefined ? body.username.trim() : existing.username
+      const passwordHash =
+        body.password !== undefined ? await bcrypt.hash(body.password, 10) : existing.password_hash
+
+      let rows: PublicUser[]
+      try {
+        rows = (await sql`
+          update users set nama = ${nama}, username = ${username}, password_hash = ${passwordHash}
+          where id = ${id}
+          returning id, nama, username, role, status, created_at
+        `) as PublicUser[]
+      } catch (err) {
+        if (err instanceof NeonDbError && err.code === '23505') {
+          throw new ApiError(409, `Username "${username}" sudah digunakan pengguna lain`)
+        }
+        throw err
       }
 
       res.status(200).json(rows[0])
