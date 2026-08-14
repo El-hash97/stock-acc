@@ -70,17 +70,17 @@ export async function getProducts(params?: {
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  const result = await request<Product | null>(`/products/${id}`)
+  const result = await request<Product | null>(`/products?id=${id}`)
   return result ?? undefined
 }
 
 export async function getProductByBarcode(barcode: string): Promise<Product | undefined> {
-  const result = await request<Product | null>(`/products/barcode/${barcode}`)
+  const result = await request<Product | null>(`/products?barcode=${barcode}`)
   return result ?? undefined
 }
 
 export async function getLowStockProducts(): Promise<Product[]> {
-  return request<Product[]>('/products/low-stock')
+  return request<Product[]>('/products?low_stock=1')
 }
 
 export async function getUsers(): Promise<PublicUser[]> {
@@ -162,7 +162,7 @@ export interface UpdateCategoryInput {
 }
 
 export async function updateCategory(input: UpdateCategoryInput): Promise<Category> {
-  return request<Category>(`/categories/${input.id}`, {
+  return request<Category>(`/categories?id=${input.id}`, {
     method: 'PATCH',
     body: JSON.stringify({ nama: input.nama }),
   })
@@ -179,7 +179,7 @@ export interface UpdateProductInput {
 
 /** Edits product identity/pricing/photo fields. Stock stays derived from stock_movements — use addStockMovement for stock changes. */
 export async function updateProduct(input: UpdateProductInput): Promise<Product> {
-  return request<Product>(`/products/${input.id}`, {
+  return request<Product>(`/products?id=${input.id}`, {
     method: 'PATCH',
     body: JSON.stringify(input),
   })
