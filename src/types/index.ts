@@ -53,6 +53,9 @@ export interface User {
   created_at: string
 }
 
+/** User shape safe to send to the client — omits password_hash. */
+export type PublicUser = Omit<User, 'password_hash'>
+
 export interface Transaction {
   id: string
   no_nota: string
